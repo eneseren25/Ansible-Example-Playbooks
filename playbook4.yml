@@ -1,0 +1,29 @@
+- name: Apache for webservers
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Install the latest version of Apache
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+    
+    - name: start apache
+      ansible.builtin.shell: "{{ item }}"
+      loop:
+        - service httpd start
+    
+    - name: tee to command
+      ansible.builtin.shell: systemctl status apache2 | tee somelog.txt
+
+- name: Apache installation for ubuntuservers
+  hosts: ubuntuservers
+  become: true
+  tasks:
+    - name: Update Ubuntu
+      ansible.builtin.shell: "apt update -y"
+
+    - name: Install apache httpd  (state=present is optional)
+      ansible.builtin.apt:
+        name: apache2
+        state: latest
+    

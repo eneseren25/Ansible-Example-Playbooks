@@ -1,0 +1,43 @@
+- name: Apache and wget installation for webservers
+  hosts: webservers
+  become: true
+  tasks:
+    - name: installing httpd and wget
+      ansible.builtin.yum:
+        pkg: "{{ item }}"
+        state: present
+      loop:
+        - httpd
+        - wget
+  
+    - name: Restart service httpd, in all cases
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+
+    - name: Start service httpd, if not started
+      ansible.builtin.service:
+        name: httpd
+        state: started
+
+- name: Apache installation and configuration for ubuntuservers
+  hosts: ubuntuservers
+  become: true
+  tasks:
+    - name: Install apache httpd  (state=present is optional)
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+    
+    - name: Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: /home/ec2-user/index.html # content: "<h1>Hello Clarusway</h1>"
+        dest: /var/www/html/index.html
+    
+    - name: Start apache2 httpd, if not started
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
+        enabled: yes
+    
+      
